@@ -9,7 +9,7 @@
     <div>
         @if (HttpContextAccessor.HttpContext.Session.GetString("UserName") != null)
         {
-            <h1 style="text-transform:capitalize">Welcome @HttpContextAccessor.HttpContext.Session.GetString("UserName")</h1>
+            <h1 style="text-transform:capitalize">Welcome @HttpContextAccessor.HttpContext.Session.GetString("Username")</h1>
         }
 
     </div>
@@ -24,9 +24,9 @@
                 <tr>
                     <td style="border-top: 10px solid white; ">
                         <div style="display:inline-flex">
-                            <div>
+                            @*@<div>
                                 <a asp-area="" asp-controller="Main" asp-route-id="@p.Id" asp-action="PostView"><img src="/Images/@p.UserProfilePicture" class="rounded-circle" style="height:100px;width:100px" /></a>
-                            </div>
+                            </div>*@
                             <div class="container">
                                 <div class="container">
                                     <div class="mr-5" style="display:inline-flex">

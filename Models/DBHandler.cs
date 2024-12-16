@@ -88,7 +88,7 @@ namespace BlogApp.Models
             }
         }
 
-        public static async Task<bool> UpdateUser(User u, string newPassword, string filename)
+        public static async Task<bool> UpdateUser(User u, string newPassword)
         {
             try
             {

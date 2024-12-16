@@ -28,5 +28,8 @@ namespace BlogApp.Models
 
         //[JsonProperty(PropertyName = "pictureFileName")]
         //public string PictureFileName { get; set; }
+
+        [JsonProperty(PropertyName = "role")]
+        public string Role { get; set; } = "User";
     }
 }

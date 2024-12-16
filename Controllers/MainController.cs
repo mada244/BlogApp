@@ -28,17 +28,24 @@ namespace BlogApp.Controllers
         [HttpGet]
         public ViewResult CreateNewPost()
         {
+            //CreatedResult();
             return View("~/Views/Main/CreatePostView.cshtml");
         }
 
         [HttpPost]
-        public async Task<ViewResult> CreateNewPost(Post p)
+        public async Task<IActionResult> CreateNewPost(Post p)
         {
+            ModelState.Remove("UserId");
+            ModelState.Remove("UserEmail");
+            ModelState.Remove("UserProfilePicture");
+            ModelState.Remove("Date");
+            ModelState.Remove("Id");
+
             if (ModelState.IsValid)
             {
                 p.UserId = HttpContext.Session.GetString("UserId");
                 p.UserEmail = HttpContext.Session.GetString("UserEmail");
-                p.UserProfilePicture = HttpContext.Session.GetString("UserProfilePicture");
+                //p.UserProfilePicture = HttpContext.Session.GetString("UserProfilePicture");
 
                 if (await DBHandler.AddPost(p))
                 {
@@ -67,6 +74,11 @@ namespace BlogApp.Controllers
         [HttpPost]
         public async Task<ViewResult> EditPost(Post ps)
         {
+            ModelState.Remove("UserId");
+            ModelState.Remove("UserEmail");
+            ModelState.Remove("UserProfilePicture");
+            ModelState.Remove("Date");
+            ModelState.Remove("Id");
             if (ModelState.IsValid)
             {
                 if (await DBHandler.UpdatePost(ps))
@@ -117,7 +129,7 @@ namespace BlogApp.Controllers
                 HttpContext.Session.Remove("UserName");
                 HttpContext.Session.Remove("UserEmail");
                 HttpContext.Session.Remove("UserPassword");
-                HttpContext.Session.Remove("UserProfilePicture");
+                //HttpContext.Session.Remove("UserProfilePicture");
             }
             return View("~/Views/Home/LoginForm.cshtml");
         }
@@ -130,53 +142,73 @@ namespace BlogApp.Controllers
         }
 
         [HttpPost]
-        public async Task<ViewResult> UpdateProfile(User u, IFormFile profile_image, string newPassword)
+        public async Task<ViewResult> UpdateProfile(User u, string newPassword)
         {
-            if (ModelState.IsValid && newPassword != null && profile_image != null)
+            User ExistingUser = await DBHandler.GetUser(u.Email);
+
+            if (!string.IsNullOrEmpty(u.Username))
             {
-                var obj = await DBHandler.ValidUser(u.Email, u.Password);
-                User us = obj.Item2;
+                ExistingUser.Username = u.Username;
+            }
 
-                if (obj.Item1)
+            //if (profile_image != null && profile_image.Length > 0)
+            //{
+                //string path = Path.Combine(this.Environment.WebRootPath, "Images");
+
+                //if (!Directory.Exists(path))
+                //{
+                    //Directory.CreateDirectory(path);
+                //}
+
+                //string fileName = Path.GetFileName(profile_image.FileName);
+                //string fullPath = Path.Combine(path, fileName);
+
+                //using (FileStream stream = new FileStream(fullPath, FileMode.Create))
+                //{
+                    //await profile_image.CopyToAsync(stream);
+                //}
+
+                //ExistingUser.PictureFileName = fileName;
+            //}
+
+            ModelState.Remove("Password");
+            //ModelState.Remove("PictureFileName");
+            ModelState.Remove("newPassword");
+            if (ModelState.IsValid)
+            {
+                if (!string.IsNullOrEmpty(newPassword))
                 {
-                    string wwwPath = this.Environment.WebRootPath;
-                    string contentPath = this.Environment.ContentRootPath;
-
-                    string path = Path.Combine(this.Environment.WebRootPath, "Images");
-                    if (!Directory.Exists(path))
+                    var obj = await DBHandler.ValidUser(u.Email, u.Password);
+                    if (obj.Item1)
                     {
-                        Directory.CreateDirectory(path);
-                    }
-
-                    string fileName = Path.GetFileName(profile_image.FileName);
-                    using (FileStream stream = new FileStream(Path.Combine(path, fileName), FileMode.Create))
-                    {
-                        await profile_image.CopyToAsync(stream);
-                    }
-
-                    if (await DBHandler.UpdateUser(u, newPassword, fileName))
-                    {
-                        us = await DBHandler.GetUser(u.Email);
-                        return View("~/Views/Main/ProfileView.cshtml", us);
+                        ExistingUser.Password = newPassword;
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, "Post Updating Failed...");
-                        return View("~/Views/Main/ProfileView.cshtml", u);
+                        ModelState.AddModelError(string.Empty, "Enter Correct Old Password");
+                        return View("~/Views/Main/ProfileView.cshtml", ExistingUser);
                     }
+                }
+
+                bool updateResult = await DBHandler.UpdateUser(ExistingUser, newPassword);
+
+                if (updateResult)
+                {
+                    User updatedUser = await DBHandler.GetUser(ExistingUser.Email);
+                    return View("~/Views/Main/ProfileView.cshtml", updatedUser);
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Enter Correct Old Password");
-                    return View("~/Views/Main/ProfileView.cshtml", u);
+                    ModelState.AddModelError(string.Empty, "Profile Update Failed...");
+                    return View("~/Views/Main/ProfileView.cshtml", ExistingUser);
                 }
             }
             else
             {
                 ModelState.AddModelError(string.Empty, "Enter Correct Data...");
-                u = await DBHandler.GetUser(u.Email);
-                return View("~/Views/Main/ProfileView.cshtml", u);
+                return View("~/Views/Main/ProfileView.cshtml", ExistingUser);
             }
         }
+
     }
 }
