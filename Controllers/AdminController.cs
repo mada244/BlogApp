@@ -36,7 +36,7 @@ namespace BlogApp.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var adminEmail = HttpContext.Session.GetString("AdminEmail");
+            var adminEmail = HttpContext.Session.GetString("UserEmail");
             var userRole = HttpContext.Session.GetString("UserRole");
 
             if (!string.IsNullOrEmpty(adminEmail) && userRole == "Admin")
@@ -45,7 +45,7 @@ namespace BlogApp.Controllers
                 return View("~/Views/Admin/AdminMainView.cshtml", UserRepository.users);
             }
 
-            return RedirectToAction("Login", "Admin");
+            return RedirectToAction("Index", "Home");
         }
 
 
@@ -80,9 +80,9 @@ namespace BlogApp.Controllers
         [HttpGet]
         public async Task<IActionResult> UpdateUser(string id)
         {
-            if (HttpContext.Session.GetString("AdminEmail") == null)
+            if (HttpContext.Session.GetString("UserEmail") == null)
             {
-                return RedirectToAction("Login", "Admin");
+                return RedirectToAction("UpdateUser", "Admin");
             }
 
             User user = await DBHandler.GetUserById(id);
@@ -98,7 +98,7 @@ namespace BlogApp.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateUser(User u, string newPassword)
         {
-            if (HttpContext.Session.GetString("AdminEmail") == null)
+            if (HttpContext.Session.GetString("UserEmail") == null)
             {
                 return RedirectToAction("Login", "Admin");
             }
@@ -144,7 +144,7 @@ namespace BlogApp.Controllers
         [HttpGet]
         public IActionResult CreateUser()
         {
-            if (HttpContext.Session.GetString("AdminEmail") == null)
+            if (HttpContext.Session.GetString("UserEmail") == null)
             {
                 return RedirectToAction("Login", "Admin");
             }
@@ -155,7 +155,7 @@ namespace BlogApp.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateUser(User u)
         {
-            if (HttpContext.Session.GetString("AdminEmail") == null)
+            if (HttpContext.Session.GetString("UserEmail") == null)
             {
                 return RedirectToAction("Login", "Admin");
             }

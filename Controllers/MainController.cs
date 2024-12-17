@@ -65,9 +65,9 @@ namespace BlogApp.Controllers
         }
 
         [HttpGet]
-        public ViewResult EditPost(int id)
+        public ViewResult EditPost(int Id)
         {
-            Post p = PostRepository.posts.Find(s => s.Id == id.ToString());
+            Post p = PostRepository.posts.Find(s => s.Id == Id.ToString());
             return View("~/Views/Main/EditPostView.cshtml", p);
         }
 
@@ -100,7 +100,9 @@ namespace BlogApp.Controllers
             }
         }
 
-        public ViewResult PostView(int id)
+        [HttpGet]
+
+        public ViewResult PostView(string id)
         {
             Post p = PostRepository.posts.Find(s => s.Id == id.ToString());
             return View("~/Views/Main/PostView.cshtml", p);
