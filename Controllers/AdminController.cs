@@ -59,7 +59,7 @@ namespace BlogApp.Controllers
 
         public async Task<IActionResult> DeleteUser(string id)
         {
-            if (HttpContext.Session.GetString("AdminEmail") == null)
+            if (HttpContext.Session.GetString("UserEmail") == null)
             {
                 return RedirectToAction("Login", "Admin");
             }

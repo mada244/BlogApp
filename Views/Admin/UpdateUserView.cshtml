@@ -37,8 +37,8 @@
 
             <div class="text-left">
                 <label class="col-form-label" asp-for="Password"> New Password</label> <br>
-                <input id="user_password_text" class="form-control" type="password" asp-for="Password">
-                <span asp-validation-for="Password"> </span> <br> <br>
+                <input id="user_password_text" class="form-control" type="password" name="newPassword" >
+                @*@<span asp-validation-for="Password"> </span> *@<br> <br>
             </div>
 
             <input id="update_button" class="btn btn-primary" type="submit" value="Update" />
